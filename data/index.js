@@ -1,12 +1,16 @@
 const express = require('express');
-const app = express();
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const socketio = require('socket.io');
+const http = require('http');
 const {
   exec
 } = require('child_process');
 
-server.listen(8080);
+
+let app = express();
+
+let server = http.createServer(app);
+let io = socketio(server)
+
 
 const getCpuLoad = (socket) => {
   exec('cat /proc/loadavg', (err, text) => {
@@ -23,6 +27,7 @@ const getCpuLoad = (socket) => {
     }
   });
 };
+
 
 const getMemoryInfo = (socket) => {
   exec('cat /proc/meminfo', (err, text) => {
@@ -55,3 +60,6 @@ io.on('connection', function(socket) {
 			clearInterval(dataLoop);
    });
 });
+
+
+server.listen(8080);

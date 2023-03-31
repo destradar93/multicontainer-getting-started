@@ -20,7 +20,7 @@ To give your device a public URL, access the device page on the [balenaCloud das
 For local development and testing using docker-compose CLI make sure that your are using an x86 machine (for example, not a Mac M1). To run locally use the command below.
 
 ```bash
-docker-compose -f docker-compose.yml up
+docker-compose -f docker-compose.yml up --build
 ```
 
 You can verify that is running by going to http://127.0.0.1:80 and see something like the image below.
