@@ -2,10 +2,12 @@ version: '2'
 services:
   frontend:
     build: ./frontend
+    restart: always
     expose:
       - "80"
   proxy:
     build: ./haproxy
+    restart: always
     depends_on:
       - frontend
       - data
@@ -13,6 +15,7 @@ services:
       - "80:80"
   data:
     build: ./data
+    restart: always
     expose:
       - "8080"
     ports:
