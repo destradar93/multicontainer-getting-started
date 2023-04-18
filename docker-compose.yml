@@ -1,11 +1,13 @@
 version: '2'
 services:
   frontend:
+    container_name: frontend
     build: ./frontend
     restart: always
     expose:
       - "80"
   proxy:
+    container_name: proxy
     build: ./haproxy
     restart: always
     depends_on:
@@ -14,6 +16,7 @@ services:
     ports:
       - "80:80"
   data:
+    container_name: data
     build: ./data
     restart: always
     expose:
@@ -21,3 +24,9 @@ services:
     ports:
       - "8080:8080"
     privileged: true
+    volumes:
+      - data-volume:/src/data
+
+volumes:
+  data-volume:
+    name: data-volume
