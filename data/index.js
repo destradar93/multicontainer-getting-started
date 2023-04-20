@@ -3,6 +3,8 @@ const socketio = require('socket.io');
 const http = require('http');
 const fs = require('fs');
 const os = require('os');
+const path = require('path')
+const routes = require('./routes');
 const {
   exec
 } = require('child_process');
@@ -11,8 +13,8 @@ const {
 let app = express();
 
 let server = http.createServer(app);
-let io = socketio(server)
-
+let io = socketio(server);
+app.use('', routes);
 
 const getCpuLoad = (socket) => {
   exec('cat /proc/loadavg', (err, text) => {
@@ -29,7 +31,6 @@ const getCpuLoad = (socket) => {
     }
   });
 };
-
 
 const getMemoryInfo = (socket) => {
   exec('cat /proc/meminfo', (err, text) => {
@@ -71,7 +72,7 @@ const collectMetricsData = () => {
   const usedMemory = totalMemory - freeMemory;
   const dataPoint = {timestamp, cpuLoad, usedMemory};
 
-  const folderPath = `${process.env.VOLUME_PATH}/${process.env.METRICS_FOLDER_NAME}`
+  const folderPath = path.join(process.env.VOLUME_PATH, process.env.METRICS_FOLDER_NAME)
 
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath);
