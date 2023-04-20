@@ -4,7 +4,18 @@ const fs = require('fs');
 const path = require('path');
 
 const router = express.Router();
-metricsDir = path.join(process.env.VOLUME_PATH, process.env.METRICS_FOLDER_NAME, '/')
+const metricsDir = path.join(process.env.VOLUME_PATH, process.env.METRICS_FOLDER_NAME, '/')
+const validKeys = [process.env.SECRET_KEY];
+
+const validateApiKey = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  if (!apiKey || !validKeys.includes(apiKey)) {
+    return res.status(401).send('Unauthorized');
+  }
+  next();
+};
+
+router.use(validateApiKey)
 
 router.get('/data/cpu', (req, res) => {
   const cpuLoad = os.loadavg()[0];
