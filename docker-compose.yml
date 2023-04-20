@@ -26,9 +26,8 @@ services:
     privileged: true
     volumes:
       - data-volume:/src/data
-    environment:
-      VOLUME_PATH: '/src/data'
-      METRICS_FOLDER_NAME: 'metrics_collection'
+    env_file:
+      - .env
 
 volumes:
   data-volume:
