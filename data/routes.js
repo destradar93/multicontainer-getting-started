@@ -1,5 +1,7 @@
 const express = require('express');
 const os = require('os');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
@@ -16,6 +18,27 @@ router.get('/data/memory', (req, res) => {
   const percentageUsed = (usedMemory / totalMemory) * 100;
 
   res.json({ totalMemory, freeMemory, usedMemory, percentageUsed });
+});
+
+router.get('/data/cpu/historic', (req, res) => {
+   metricsDir = path.join(process.env.VOLUME_PATH, process.env.METRICS_FOLDER_NAME, '/');
+
+  fs.readdir(metricsDir, (err, files) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send('Error retrieving metrics');
+    }
+
+    const cpuMetrics = files.map((file) => {
+      const data = fs.readFileSync(path.join(metricsDir, file));
+      metric = JSON.parse(data)
+      const timestamp = metric.timestamp;
+      const cpuLoad = metric.cpuLoad;
+
+      return {timestamp, cpuLoad};
+    });
+    res.json(cpuMetrics);
+  });
 });
 
 module.exports = router;
