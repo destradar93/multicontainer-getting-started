@@ -1,6 +1,8 @@
 const express = require('express');
 const socketio = require('socket.io');
 const http = require('http');
+const fs = require('fs');
+const os = require('os');
 const {
   exec
 } = require('child_process');
@@ -61,5 +63,28 @@ io.on('connection', function(socket) {
    });
 });
 
+const collectMetricsData = () => {
+  const timestamp = Date.now();
+  const cpuLoad = os.loadavg()[0];
+  const totalMemory = os.totalmem();
+  const freeMemory = os.freemem();
+  const usedMemory = totalMemory - freeMemory;
+  const dataPoint = {timestamp, cpuLoad, usedMemory};
 
+  const folderPath = `${process.env.VOLUME_PATH}/${process.env.METRICS_FOLDER_NAME}`
+
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
+  }
+  
+  const filePath = `${folderPath}/${timestamp}.json`;
+  try {
+    fs.writeFileSync(filePath, JSON.stringify(dataPoint));
+    console.log(`Metrics data written to file at ${filePath}`);
+  } catch (error) {
+    console.error(`Error writing data to file: ${error}`);
+  }
+};
+
+setInterval(collectMetricsData, 60000);
 server.listen(8080);
