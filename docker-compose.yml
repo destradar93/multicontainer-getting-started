@@ -4,8 +4,7 @@ services:
     container_name: frontend
     build: ./frontend
     restart: always
-    expose:
-      - "80"
+    network_mode: host
   proxy:
     container_name: proxy
     build: ./haproxy
@@ -13,21 +12,17 @@ services:
     depends_on:
       - frontend
       - data
-    ports:
-      - "80:80"
+    network_mode: host
   data:
     container_name: data
     build: ./data
     restart: always
-    expose:
-      - "8080"
-    ports:
-      - "8080:8080"
     privileged: true
     volumes:
       - data-volume:/src/data
     env_file:
       - .env
+    network_mode: host
 
 volumes:
   data-volume:
