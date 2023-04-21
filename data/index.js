@@ -4,17 +4,23 @@ const http = require('http');
 const fs = require('fs');
 const os = require('os');
 const path = require('path')
+const AWS = require('aws-sdk');
 const routes = require('./routes');
+const { getMacAddress } = require('./utils');
+
 const {
   exec
 } = require('child_process');
 
+const sqs = new AWS.SQS();
 
 let app = express();
 
 let server = http.createServer(app);
 let io = socketio(server);
 app.use('', routes);
+
+const deviceId = getMacAddress();
 
 const getCpuLoad = (socket) => {
   exec('cat /proc/loadavg', (err, text) => {
@@ -85,7 +91,18 @@ const collectMetricsData = () => {
   } catch (error) {
     console.error(`Error writing data to file: ${error}`);
   }
+
+  exportDataToSQS(dataPoint)
 };
+
+const exportDataToSQS = (dataPoint) => {
+  const params = {
+    MessageBody: JSON.stringify({"deviceId": deviceId, ...dataPoint}),
+    QueueUrl: process.env.QUEUE_URL, 
+  };
+
+  return sqs.sendMessage(params).promise();
+}
 
 setInterval(collectMetricsData, 60000);
 server.listen(8080);
