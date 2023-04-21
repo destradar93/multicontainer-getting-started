@@ -18,6 +18,7 @@
     "strict": true
   },
   "dependencies": {
+    "aws-sdk": "^2.1362.0",
     "express": "^4.16.3",
     "socket.io": "^2.1.0"
   }
