@@ -12,7 +12,7 @@ const {
   exec
 } = require('child_process');
 
-const sqs = new AWS.SQS();
+const sqs = new AWS.SQS({region: process.env.AWS_REGION});
 
 let app = express();
 
